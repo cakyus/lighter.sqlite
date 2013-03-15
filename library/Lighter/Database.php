@@ -21,11 +21,21 @@ class Database {
     
     public function query($sql) {
         
-        if (!$query = self::$connection->query($sql)) {
-            return false;
+        try {
+            $query = self::$connection->query($sql);
+        } catch (\Exception $e) {
+            throw $e;
         }
         
         return $query;
+    }
+    
+    public function escape($string) {
+        return self::$connection->escapeString($string);
+    }
+    
+    public function lastInsertRowId() {
+        return self::$connection->lastInsertRowID();
     }
     
     public function version() {

@@ -30,10 +30,73 @@ class Test {
         debug_print('Class-Name:', get_class($query));
     }
     
-    public function testRecord() {
-        $record = new \Lighter\Database\Record('users');
-        $record->get(1);
+    public function testRecordRead() {
+        $user = new \Lighter\Database\Record('users');
+        // get user with id = 1
+        $user->get(1);
+        debug_print('User-Name:', $user->name);
     }
+    
+    public function testRecordUpdate() {
+        
+        $user = new \Lighter\Database\Record('users');
+        $name = "administrator";
+        $time = time();
+        // get user with id = 1, ie. "admin"
+        $user->get(1);
+        $user->name = $name;
+        $user->timeCreate = $time;
+        $user->set();
+        // load once again
+        $user->get(1);
+        
+        if ($time != $user->timeCreate) {
+            throw new \Exception("Update field timeCreate fail");
+        }
+        
+        if ($name != $user->name) {
+            throw new \Exception("Update field name fail");
+        }
+    }
+    
+    public function testRecordDelete() {
+        
+        $user = new \Lighter\Database\Record('users');
+        // get user with id = 1, ie. "admin"
+        $user->get(1);
+        $user->del();
+        
+        try {
+            $user->get(1);
+        } catch (\Exception $e) {
+            echo $e->getMessage()."\n";
+        }
+    }
+    
+    public function testRecordInsert() {
+        
+        $user = new \Lighter\Database\Record('users');
+        
+        $name = "admin123";
+        $time = time();
+        
+        $user->name = $name;
+        $user->timeCreate = $time;
+        $user->put();
+        
+        $id = $user->id;
+        
+        $user->get($id);
+        
+        if ($time != $user->timeCreate) {
+            throw new \Exception("Insert field timeCreate fail");
+        }
+        
+        if ($name != $user->name) {
+            throw new \Exception("Insert field name fail");
+        }
+    }
+    
     
     public function start() {
 
@@ -49,6 +112,7 @@ class Test {
 }
 
 function debug_print() {
+    // @todo display class name and function name who call this function
     echo date('H:i:s ').implode("\t",func_get_args())."\n";
 }
 
